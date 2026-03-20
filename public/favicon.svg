@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Background circle -->
+  <circle cx="16" cy="16" r="16" fill="#0f1e2e"/>
+  <!-- Shield shape in gold -->
+  <path d="M16 5 L24 8.5 L24 17 C24 21.5 20.5 25 16 27 C11.5 25 8 21.5 8 17 L8 8.5 Z"
+        fill="#e8b44b"/>
+  <!-- Inner shield highlight -->
+  <path d="M16 8 L21.5 10.5 L21.5 17 C21.5 20.2 19.2 23 16 24.5 C12.8 23 10.5 20.2 10.5 17 L10.5 10.5 Z"
+        fill="#0f1e2e" opacity="0.3"/>
+  <!-- Checkmark / tick -->
+  <polyline points="12.5,16.5 15,19 20,13.5"
+            stroke="#0f1e2e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>
