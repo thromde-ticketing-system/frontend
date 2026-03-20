@@ -20,7 +20,7 @@ export default function Login() {
       navigate(user.role === 'admin' ? '/admin/dashboard' : '/dashboard')
     } catch (err) {
       if (!err.response) {
-        setError('Cannot connect to server. Make sure the backend is running on port 8000.')
+        setError(`Cannot connect to server (${import.meta.env.VITE_API_URL || 'http://localhost:8000/api'}). Check that the backend is deployed and running.`)
       } else {
         const msg = err.response?.data?.errors?.email?.[0]
           || err.response?.data?.message
