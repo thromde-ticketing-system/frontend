@@ -2,7 +2,7 @@ import axios from 'axios'
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api',
-  timeout: 30000, // 30 seconds — handles Render cold start wake-up time
+  timeout: 90000, // 90 seconds — Render free tier cold start can take up to 60s
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',

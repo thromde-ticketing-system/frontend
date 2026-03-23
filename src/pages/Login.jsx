@@ -8,26 +8,33 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [slowWarning, setSlowWarning] = useState(false)
   const { login } = useAuth()
   const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    setSlowWarning(false)
     setLoading(true)
+    const timer = setTimeout(() => setSlowWarning(true), 8000)
     try {
       const user = await login(form.email, form.password)
       navigate(user.role === 'admin' ? '/admin/dashboard' : '/dashboard')
     } catch (err) {
       if (!err.response) {
-        setError(`Cannot connect to server (${import.meta.env.VITE_API_URL || 'http://localhost:8000/api'}). Check that the backend is deployed and running.`)
+        setError('Server is taking too long to respond. Please try again — it may be starting up.')
       } else {
         const msg = err.response?.data?.errors?.email?.[0]
           || err.response?.data?.message
           || 'Login failed. Please try again.'
         setError(msg)
       }
-    } finally { setLoading(false) }
+    } finally {
+      clearTimeout(timer)
+      setLoading(false)
+      setSlowWarning(false)
+    }
   }
 
   return (
@@ -44,6 +51,13 @@ export default function Login() {
 
         <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-8 border border-slate-200 dark:border-slate-700">
           <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6">Sign in to your account</h2>
+
+          {slowWarning && !error && (
+            <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg text-amber-700 dark:text-amber-400 text-sm">
+              <p className="font-semibold">Server is waking up...</p>
+              <p className="text-xs mt-0.5">The server starts from sleep on first use. Please wait up to 60 seconds.</p>
+            </div>
+          )}
 
           {error && (
             <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-center gap-2 text-red-700 dark:text-red-400 text-sm">
