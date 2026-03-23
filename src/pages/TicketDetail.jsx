@@ -288,6 +288,7 @@ export default function TicketDetail() {
   const [imgCollapsed, setImgCollapsed] = useState(false)
 
   const [attachFile, setAttachFile] = useState(null)
+  const [chatError, setChatError] = useState('')
 
   const bottomRef = useRef(null)
   const textareaRef = useRef(null)
@@ -357,6 +358,7 @@ export default function TicketDetail() {
   const submitComment = async () => {
     const text = textareaRef.current?.value?.trim()
     if ((!text && !attachFile) || submitting) return
+    setChatError('')
     setSubmitting(true)
     setInputKey(k => k + 1)
     setHasText(false)
@@ -376,7 +378,10 @@ export default function TicketDetail() {
       }
       setComments(prev => prev.some(c => c.id === res.data.id) ? prev : [...prev, res.data])
       setIsInternal(false)
-    } catch {}
+    } catch (err) {
+      const msg = err.response?.data?.message || 'Failed to send message. Please try again.'
+      setChatError(msg)
+    }
     finally { setSubmitting(false) }
   }
 
@@ -731,6 +736,9 @@ export default function TicketDetail() {
                       <Send size={15} />
                     </button>
                   </div>
+                  {chatError && (
+                    <p className="text-[11px] text-red-500 mt-1 pl-1">{chatError}</p>
+                  )}
                   <p className="text-[10px] text-slate-400 mt-1 pl-1">Enter to send · Shift+Enter for new line</p>
                 </div>
               )}
