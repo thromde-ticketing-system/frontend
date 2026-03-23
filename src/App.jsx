@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { ThemeProvider } from './context/ThemeContext'
+import api from './services/api'
 
 import Login from './pages/Login'
 import PublicTracker from './pages/PublicTracker'
@@ -53,6 +54,12 @@ function AppRoutes() {
 }
 
 export default function App() {
+  // Pre-warm the Render backend the instant the app loads.
+  // This starts waking the server from sleep before the user even clicks anything.
+  useEffect(() => {
+    api.get('/health-check').catch(() => {})
+  }, [])
+
   return (
     <ThemeProvider>
       <AuthProvider>

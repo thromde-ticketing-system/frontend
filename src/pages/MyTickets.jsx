@@ -26,7 +26,19 @@ export default function MyTickets() {
   const [sortDir, setSortDir] = useState('desc')
 
   const fetchTickets = useCallback(async (s = search, st = status, pr = priority, p = page, sb = sortBy, sd = sortDir) => {
-    setLoading(true)
+    const cacheKey = `my_tickets_${st}_${p}`
+    // Show cached data instantly so page never looks empty
+    const cached = localStorage.getItem(cacheKey)
+    if (cached) {
+      try {
+        const { data, pagination: pg } = JSON.parse(cached)
+        setTickets(data)
+        setPagination(pg)
+        setLoading(false)
+      } catch {}
+    } else {
+      setLoading(true)
+    }
     try {
       const params = { page: p }
       if (s) params.search = s
@@ -34,8 +46,11 @@ export default function MyTickets() {
       if (pr) params.priority = pr
       if (sb) { params.sort_by = sb; params.sort_dir = sd }
       const res = await api.get('/tickets/my', { params })
-      setTickets(res.data.data || [])
-      setPagination({ total: res.data.total, current: res.data.current_page, last: res.data.last_page })
+      const data = res.data.data || []
+      const pg = { total: res.data.total, current: res.data.current_page, last: res.data.last_page }
+      setTickets(data)
+      setPagination(pg)
+      if (!s) localStorage.setItem(cacheKey, JSON.stringify({ data, pagination: pg }))
     } catch {}
     finally { setLoading(false) }
   }, [])

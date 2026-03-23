@@ -121,7 +121,19 @@ export default function AdminTickets() {
     s = search, st = status, pr = priority, df = dateFrom, dt = dateTo,
     p = page, sb = sortBy, sd = sortDir, at = assignedTo
   ) => {
-    setLoading(true)
+    const cacheKey = `admin_tickets_${st}_${p}`
+    // Show cached data instantly so page never looks empty
+    const cached = localStorage.getItem(cacheKey)
+    if (cached) {
+      try {
+        const { data, pagination: pg } = JSON.parse(cached)
+        setTickets(data)
+        setPagination(pg)
+        setLoading(false)
+      } catch {}
+    } else {
+      setLoading(true)
+    }
     try {
       const params = { page: p, sort_by: sb, sort_dir: sd }
       if (s) params.search = s
@@ -131,8 +143,14 @@ export default function AdminTickets() {
       if (dt) params.date_to = dt
       if (at) params.assigned_to = at
       const res = await api.get('/admin/tickets', { params })
-      setTickets(res.data.data || [])
-      setPagination({ total: res.data.total, current: res.data.current_page, last: res.data.last_page })
+      const data = res.data.data || []
+      const pg = { total: res.data.total, current: res.data.current_page, last: res.data.last_page }
+      setTickets(data)
+      setPagination(pg)
+      // Only cache simple queries (no search/date filters) for reuse
+      if (!s && !df && !dt && !at) {
+        localStorage.setItem(cacheKey, JSON.stringify({ data, pagination: pg }))
+      }
     } catch {}
     finally { setLoading(false) }
   }, [])
